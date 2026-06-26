@@ -20,7 +20,8 @@ namespace Invector.vCharacterController
 
         public bool CanMove =>
             CurrentState == PlayerState.Normal ||
-            CurrentState == PlayerState.Dodge;
+            CurrentState == PlayerState.Dodge ||
+            CurrentState == PlayerState.Crouch;
 
         public bool CanAttack =>
             CurrentState == PlayerState.Normal;
@@ -35,6 +36,9 @@ namespace Invector.vCharacterController
             CurrentState == PlayerState.Normal ||
             CurrentState == PlayerState.Dodge;
 
+        public bool IsCrouching =>
+            CurrentState == PlayerState.Crouch;
+
         #endregion
 
         #region Unity
@@ -43,7 +47,6 @@ namespace Invector.vCharacterController
         {
             controller = GetComponent<vThirdPersonController>();
             animator = GetComponent<Animator>();
-
             SetState(PlayerState.Normal);
         }
 
@@ -57,16 +60,11 @@ namespace Invector.vCharacterController
                 return false;
 
             PrepareAction(action);
-
             TriggerAction(action);
-
             return true;
         }
 
-        public void BeginAction()
-        {
-            // Untuk Animation Event / SMB nanti
-        }
+        public void BeginAction() { }
 
         public void EndAction()
         {
@@ -76,13 +74,29 @@ namespace Invector.vCharacterController
         public void BeginDodge()
         {
             controller.StopMovementImmediately();
-
             SetState(PlayerState.Dodge);
         }
 
         public void EndDodge()
         {
+            // Selalu kembali ke Normal setelah dodge, tidak peduli dari state apa
             SetState(PlayerState.Normal);
+        }
+
+        public void EnterCrouch()
+        {
+            if (CurrentState != PlayerState.Normal) return;
+            SetState(PlayerState.Crouch);
+            animator.SetBool(AnimatorParameters.Crouch, true);
+            // Tambah sementara:
+            Debug.Log($"lockMovement = {controller.lockMovement}");
+        }
+
+        public void ExitCrouch()
+        {
+            if (CurrentState != PlayerState.Crouch) return;
+            SetState(PlayerState.Normal);
+            animator.SetBool(AnimatorParameters.Crouch, false);
         }
 
         #endregion
@@ -99,15 +113,10 @@ namespace Invector.vCharacterController
             switch (action)
             {
                 case CombatAction.Dodge:
-
                     controller.ClearMovementInput();
-
                     break;
-
                 default:
-
                     controller.StopMovementImmediately();
-
                     break;
             }
         }
@@ -121,29 +130,12 @@ namespace Invector.vCharacterController
         {
             switch (action)
             {
-                case CombatAction.Punch:
-
-                    return AnimatorParameters.Punch;
-
-                case CombatAction.Headbutt:
-
-                    return AnimatorParameters.Headbutt;
-
-                case CombatAction.Uppercut:
-
-                    return AnimatorParameters.Uppercut;
-
-                case CombatAction.LeftHook:
-
-                    return AnimatorParameters.LeftHook;
-
-                case CombatAction.Dodge:
-
-                    return AnimatorParameters.Dodge;
-
-                default:
-
-                    return 0;
+                case CombatAction.Punch: return AnimatorParameters.Punch;
+                case CombatAction.Headbutt: return AnimatorParameters.Headbutt;
+                case CombatAction.Uppercut: return AnimatorParameters.Uppercut;
+                case CombatAction.LeftHook: return AnimatorParameters.LeftHook;
+                case CombatAction.Dodge: return AnimatorParameters.Dodge;
+                default: return 0;
             }
         }
 
@@ -153,39 +145,38 @@ namespace Invector.vCharacterController
 
         public void SetState(PlayerState state)
         {
-            if (CurrentState == state)
-                return;
+            if (CurrentState == state) return;
 
             CurrentState = state;
 
             switch (state)
             {
                 case PlayerState.Normal:
-
                     controller.lockMovement = false;
                     controller.lockRotation = false;
                     break;
 
-                case PlayerState.Attack:
+                case PlayerState.Crouch:
+                    controller.lockMovement = true;  // tidak bisa gerak saat crouch idle
+                    controller.lockRotation = true; // kamera tetap bisa rotate
+                    break;
 
+                case PlayerState.Attack:
                     controller.lockMovement = true;
                     controller.lockRotation = true;
                     break;
 
                 case PlayerState.Dodge:
-
                     controller.lockMovement = false;
                     controller.lockRotation = false;
                     break;
 
                 case PlayerState.Hit:
-
                     controller.lockMovement = true;
                     controller.lockRotation = true;
                     break;
 
                 case PlayerState.Dead:
-
                     controller.lockMovement = true;
                     controller.lockRotation = true;
                     break;

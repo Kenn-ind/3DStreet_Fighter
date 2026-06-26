@@ -693,7 +693,7 @@ MonoBehaviour:
   headbuttInput: 114
   uppercutInput: 101
   leftHookInput: 113
-  crouchInput: 308
+  crouchInput: 306
 --- !u!114 &1744117699
 MonoBehaviour:
   m_ObjectHideFlags: 0

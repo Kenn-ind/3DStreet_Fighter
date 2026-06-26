@@ -1,4 +1,4 @@
-namespace Invector.vCharacterController
+﻿namespace Invector.vCharacterController
 {
     public enum PlayerState
     {
@@ -6,6 +6,7 @@ namespace Invector.vCharacterController
         Attack,
         Dodge,
         Hit,
-        Dead
+        Dead,
+        Crouch  // ← tambahkan ini
     }
 }
