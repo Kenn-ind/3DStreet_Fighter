@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 namespace Invector.vCharacterController
 {
@@ -11,6 +12,7 @@ namespace Invector.vCharacterController
         public KeyCode crouchInput = KeyCode.LeftControl;
 
         private CombatManager combat;
+        private bool isExitingCrouch = false;
 
         protected override void Start()
         {
@@ -29,16 +31,15 @@ namespace Invector.vCharacterController
             MoveInput();
             CameraInput();
 
-            // CrouchInput harus selalu dipanggil, sebelum return
             CrouchInput();
 
-            // Blok input movement saat crouch
-            if (combat.IsCrouching)
+            if (combat.IsCrouching || isExitingCrouch)
             {
                 cc.input = Vector3.zero;
                 cc.inputSmooth = Vector3.zero;
                 cc.moveDirection = Vector3.zero;
-                return; // skip sprint, jump, strafe
+                cc._rigidbody.velocity = new Vector3(0f, cc._rigidbody.velocity.y, 0f);
+                return;
             }
 
             if (combat.CanSprint) SprintInput();
@@ -49,17 +50,15 @@ namespace Invector.vCharacterController
 
         private void CombatInput()
         {
-            // Dodge: bisa dari Normal atau Crouch
             if (Input.GetMouseButtonDown(1))
             {
                 if (combat.IsCrouching)
-                    combat.ExitCrouch(); // → state jadi Normal dulu
+                    combat.ExitCrouch();
 
-                combat.PerformAction(CombatAction.Dodge); // CanPerformAction cek Normal ✓
+                combat.PerformAction(CombatAction.Dodge);
                 return;
             }
 
-            // Serangan lain: hanya dari Normal
             if (!combat.CanAttack) return;
 
             if (Input.GetMouseButtonDown(0))
@@ -89,9 +88,26 @@ namespace Invector.vCharacterController
             if (!Input.GetKeyDown(crouchInput)) return;
 
             if (combat.IsCrouching)
-                combat.ExitCrouch();
+                StartCoroutine(ExitCrouchRoutine());
             else
                 combat.EnterCrouch();
+        }
+
+        private IEnumerator ExitCrouchRoutine()
+        {
+            combat.ExitCrouch();
+            isExitingCrouch = true;
+
+            // Tunggu 1 frame agar animator update
+            yield return null;
+
+            yield return new WaitUntil(() =>
+            {
+                var stateInfo = cc.animator.GetCurrentAnimatorStateInfo(0);
+                return !stateInfo.IsName("CrouchExit") && !cc.animator.IsInTransition(0);
+            });
+
+            isExitingCrouch = false;
         }
     }
 }
