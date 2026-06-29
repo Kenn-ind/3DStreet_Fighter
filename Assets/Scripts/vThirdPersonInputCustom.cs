@@ -55,6 +55,21 @@ namespace Invector.vCharacterController
                 if (combat.IsCrouching)
                     combat.ExitCrouch();
 
+                // Nonaktifkan strafe hanya jika dodge bukan ke depan
+                if (cc.isStrafing && !IsDodgingForward())
+                    cc.Strafe();
+
+                //dodge selesai = strafe mode aktif kembali
+                //if (cc.isStrafing)
+                //{
+                //    combat.SetWasStrafing(true); // simpan bahwa dodge dari strafe
+                //    cc.Strafe(); // nonaktifkan strafe
+                //}
+                //else
+                //{
+                //    combat.SetWasStrafing(false);
+                //}
+
                 combat.PerformAction(CombatAction.Dodge);
                 return;
             }
@@ -81,6 +96,12 @@ namespace Invector.vCharacterController
                 combat.PerformAction(CombatAction.LeftHook);
                 return;
             }
+        }
+
+        private bool IsDodgingForward()
+        {
+            // Cek input vertical positif (ke depan) dan horizontal mendekati nol
+            return cc.input.z > 0.1f && Mathf.Abs(cc.input.x) < 0.5f;
         }
 
         private void CrouchInput()

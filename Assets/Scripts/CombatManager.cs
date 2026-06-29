@@ -8,6 +8,8 @@ namespace Invector.vCharacterController
 
         private vThirdPersonController controller;
         private Animator animator;
+        //dodge selesai = strafe mode aktif kembali
+        //private bool _wasStrafingBeforeDodge = false;
 
         public PlayerState CurrentState { get; private set; }
 
@@ -77,10 +79,23 @@ namespace Invector.vCharacterController
             SetState(PlayerState.Dodge);
         }
 
+        //dodge selesai = strafe mode aktif kembali
+        //public void SetWasStrafing(bool value)
+        //{
+        //    _wasStrafingBeforeDodge = value;
+        //}
+
         public void EndDodge()
         {
             // Selalu kembali ke Normal setelah dodge, tidak peduli dari state apa
             SetState(PlayerState.Normal);
+
+            // Aktifkan kembali strafe jika dodge berasal dari strafe mode
+            //if (_wasStrafingBeforeDodge)
+            //{
+            //    _wasStrafingBeforeDodge = false;
+            //    controller.Strafe();
+            //}
         }
 
         public void EnterCrouch()
