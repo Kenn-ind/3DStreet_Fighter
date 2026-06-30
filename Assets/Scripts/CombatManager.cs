@@ -26,7 +26,9 @@ namespace Invector.vCharacterController
             CurrentState == PlayerState.Crouch;
 
         public bool CanAttack =>
-            CurrentState == PlayerState.Normal;
+            CurrentState == PlayerState.Normal &&
+            controller.isGrounded &&
+            !controller.isJumping;
 
         public bool CanJump =>
             CurrentState == PlayerState.Normal;

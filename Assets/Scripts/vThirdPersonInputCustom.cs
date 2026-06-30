@@ -50,6 +50,10 @@ namespace Invector.vCharacterController
 
         private void CombatInput()
         {
+            // Blokir semua combat input (termasuk dodge) saat airborne
+            if (!cc.isGrounded || cc.isJumping)
+                return;
+
             if (Input.GetMouseButtonDown(1))
             {
                 if (combat.IsCrouching)
