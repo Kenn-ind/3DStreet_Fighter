@@ -43,6 +43,12 @@ namespace Invector.vCharacterController
         public bool IsCrouching =>
             CurrentState == PlayerState.Crouch;
 
+        public bool CanFlyingKick =>
+            CurrentState == PlayerState.Normal &&
+            controller.isGrounded &&
+            !controller.isJumping &&
+            controller.isSprinting;
+
         #endregion
 
         #region Unity
@@ -152,6 +158,7 @@ namespace Invector.vCharacterController
                 case CombatAction.Uppercut: return AnimatorParameters.Uppercut;
                 case CombatAction.LeftHook: return AnimatorParameters.LeftHook;
                 case CombatAction.Dodge: return AnimatorParameters.Dodge;
+                case CombatAction.FlyingKick: return AnimatorParameters.FlyingKick;
                 default: return 0;
             }
         }
@@ -195,6 +202,10 @@ namespace Invector.vCharacterController
 
                 case PlayerState.Dead:
                     controller.lockMovement = true;
+                    controller.lockRotation = true;
+                    break;
+                case PlayerState.FlyingKick:
+                    controller.lockMovement = true;  // root motion yang handle movement
                     controller.lockRotation = true;
                     break;
             }

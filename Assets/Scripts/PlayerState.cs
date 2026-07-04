@@ -7,6 +7,7 @@
         Dodge,
         Hit,
         Dead,
-        Crouch  // ← tambahkan ini
+        Crouch,  // ← tambahkan ini
+        FlyingKick
     }
 }

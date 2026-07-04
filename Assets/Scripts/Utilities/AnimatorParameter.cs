@@ -15,5 +15,7 @@ namespace Invector.vCharacterController
         public static readonly int Dodge = Animator.StringToHash("isDodging");
 
         public static readonly int Crouch = Animator.StringToHash("isCrouching");
+
+        public static readonly int FlyingKick = Animator.StringToHash("isFlyingKick");
     }
 }

@@ -54,6 +54,13 @@ namespace Invector.vCharacterController
             if (!cc.isGrounded || cc.isJumping)
                 return;
 
+            // Flying Kick: Shift + W + Left Click
+            if (Input.GetMouseButtonDown(0) && combat.CanFlyingKick && IsFlyingKickInput())
+            {
+                combat.PerformAction(CombatAction.FlyingKick);
+                return;
+            }
+
             if (Input.GetMouseButtonDown(1))
             {
                 if (combat.IsCrouching)
@@ -100,6 +107,12 @@ namespace Invector.vCharacterController
                 combat.PerformAction(CombatAction.LeftHook);
                 return;
             }
+        }
+
+        private bool IsFlyingKickInput()
+        {
+            // Harus sprint + input ke depan (W)
+            return cc.isSprinting && cc.input.z > 0.5f && Mathf.Abs(cc.input.x) < 0.5f;
         }
 
         private bool IsDodgingForward()

@@ -10,6 +10,8 @@ namespace Invector.vCharacterController
 
         LeftHook,
 
-        Dodge
+        Dodge,
+
+        FlyingKick
     }
 }
