@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Invector.vCharacterController
 {
@@ -74,12 +74,12 @@ namespace Invector.vCharacterController
             return true;
         }
 
-        public void BeginAction() { }
+        //public void BeginAction() { }
 
-        public void EndAction()
-        {
-            SetState(PlayerState.Normal);
-        }
+        //public void EndAction()
+        //{
+        //    SetState(PlayerState.Normal);
+        //}
 
         public void BeginDodge()
         {
@@ -137,6 +137,10 @@ namespace Invector.vCharacterController
             {
                 case CombatAction.Dodge:
                     controller.ClearMovementInput();
+                    break;
+                case CombatAction.FlyingKick:
+                    controller.isSprinting = false; // ← reset di awal, bukan di akhir
+                    // Jangan hentikan momentum sprint
                     break;
                 default:
                     controller.StopMovementImmediately();
